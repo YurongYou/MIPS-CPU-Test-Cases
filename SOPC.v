@@ -1,27 +1,17 @@
 `timescale 1ns/100ps
 `define DEBUG 1
-`include "../define.v"
-`include "../regfile.v"
-`include "../pipeline_CPU.v"
-`include "../hilo_reg.v"
-`include "../BranchControl.v"
-`include "../HazardControl.v"
-`include "../ForwardControl.v"
-`include "../IF.v"
-`include "../IF_ID.v"
-`include "../ID.v"
-`include "../ID_EX.v"
-`include "../EX.v"
-`include "../ALU.v"
-`include "../decoder.v"
-`include "../EX_MEM.v"
-`include "../MEM.v"
-`include "../RM_ctrl.v"
-`include "../WM_ctrl.v"
-`include "../MEM_WB.v"
-`include "../utilities/dffe.v"
-`include "../utilities/mux2x1.v"
-`include "../utilities/mux4x1.v"
+`define RegDataWidth	32
+`define ByteSlctWidth	4
+`define MemAddrWidth	32
+`define MemDataWidth	32
+`define InstAddrWidth	32
+`define InstDataWidth	32
+`define RstEnable		1'b1
+`define ZeroWord		32'b0
+`define ChipEnable		1'b1
+`define WriteEnable		1'b1
+
+
 `include "rom.v"
 `include "memory.v"
 module SOPC;
@@ -41,21 +31,24 @@ module SOPC;
 	supply1 					vcc;
 	supply0 					gnd;
 
-	pipeline_CPU CPU(
-		.clk(clk),
-		.rst(rst),
-		.data_from_mem(data_from_mem),
-		.mem_addr(mem_addr),
-		.mem_byte_slct(mem_byte_slct),
-		.data_to_write_mem(data_to_write_mem),
-		.mem_we(mem_we),
-		.mem_re(mem_re),
-		.inst_from_rom(inst_from_rom),
-		.rom_addr(rom_addr),
-		.rom_ce(rom_ce)
-	);
+	/*
+		insert your CPU here, for example
+		pipeline_CPU CPU(
+			.clk(clk),
+			.rst(rst),
+			.data_from_mem(data_from_mem),
+			.mem_addr(mem_addr),
+			.mem_byte_slct(mem_byte_slct),
+			.data_to_write_mem(data_to_write_mem),
+			.mem_we(mem_we),
+			.mem_re(mem_re),
+			.inst_from_rom(inst_from_rom),
+			.rom_addr(rom_addr),
+			.rom_ce(rom_ce)
+		);
+	 */
 
-	rom #(.InstMemNum(32)) ROM(
+	rom ROM(
 		.rst(gnd),
 		.ce(rom_ce),
 		.addr(rom_addr),
@@ -76,9 +69,9 @@ module SOPC;
 		forever #1 clk = ~clk;
 	end
 	initial begin
-		$dumpfile("test_info/branch/branch.vcd");
+		$dumpfile(/* input path to dump the waveform file */);
 		$dumpvars;
-		$readmemh("test_info/branch/branch.data", ROM.rom_data, 0, 10);
+		$readmemh(/* choose which case you want to test*/, ROM.rom_data, 0, /* #line of the rom data - 1*/);
 		rst = `RstEnable;
 		#3 rst = ~`RstEnable;
 		#60 $finish;

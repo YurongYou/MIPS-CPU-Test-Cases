@@ -1,4 +1,4 @@
-// `include "../define.v"
+
 module rom (
 	input							rst,
 	input 							ce,
